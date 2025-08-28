@@ -1,0 +1,30 @@
+# Archivos generados por compilación
+build/
+*.o
+*.elf
+*.hex
+*.lst
+*.map
+
+# Archivos de respaldo
+*~
+*.bak
+*.backup
+
+# Archivos del sistema macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Archivos temporales del editor
+*.swp
+*.swo
+*~
+
+# Archivos de configuración específicos del usuario
+.vscode/settings.json
+.vscode/launch.json

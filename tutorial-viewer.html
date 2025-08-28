@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Tutorial ATmega328P - Visualizador Interactivo</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            grid-template-rows: auto 1fr;
+            min-height: 100vh;
+            background: white;
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 8px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+
+        .nav-item:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-item.active {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .nav-item .emoji {
+            margin-right: 8px;
+        }
+
+        .nav-item .time {
+            float: right;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        .content {
+            padding: 30px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .content h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content h2 {
+            color: #34495e;
+            margin: 30px 0 15px 0;
+            padding-left: 15px;
+            border-left: 4px solid #3498db;
+        }
+
+        .content h3 {
+            color: #555;
+            margin: 25px 0 10px 0;
+        }
+
+        .content pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .content code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: #e91e63;
+        }
+
+        .content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .content blockquote {
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content th,
+        .content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .content th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .content tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .error {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px;
+            border-left: 4px solid #d63031;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: #28a745;
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+                max-height: 300px;
+            }
+
+            .nav-item {
+                display: inline-block;
+                margin: 5px;
+                padding: 8px 12px;
+            }
+        }
+
+        .welcome-screen {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .welcome-screen h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border: none;
+            padding: 0;
+        }
+
+        .welcome-screen .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .feature-card h3 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Tutorial ATmega328P</h1>
+            <p>Visualizador Interactivo - De Microchip Studio a macOS Professional</p>
+        </div>
+
+        <nav class="sidebar">
+            <div class="nav-section">
+                <h3>🔰 Configuración Básica</h3>
+                <div class="nav-item" data-file="tutorial/README.md">
+                    <span class="emoji">🏠</span> Inicio
+                </div>
+                <div class="nav-item" data-file="tutorial/01-requisitos.md">
+                    <span class="emoji">✅</span> Requisitos
+                    <span class="time">3 min</span>
+                </div>
+                <div class="nav-item" data-file="tutorial/02-instalacion-basica.md">
+                    <span class="emoji">🛠️</span> Instalación Básica
+                    <span class="time">10 min</span>
+                </div>
+                <div class="nav-item" data-file="tutorial/03-workflow-diario.md">
+                    <span class="emoji">⚡</span> Workflow Diario
+                    <span class="time">7 min</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <h3>🔧 Configuración Avanzada</h3>
+                <div class="nav-item" data-file="tutorial/04-configurar-vscode.md">
+                    <span class="emoji">💻</span> Configurar VS Code
+                    <span class="time">12 min</span>
+                </div>
+                <div class="nav-item" data-file="tutorial/05-primer-proyecto.md">
+                    <span class="emoji">🎯</span> Primer Proyecto
+                    <span class="time">10 min</span>
+                </div>
+                <div class="nav-item" data-file="tutorial/06-hardware-xplain.md">
+                    <span class="emoji">🔌</span> Hardware Xplain
+                    <span class="time">8 min</span>
+                </div>
+                <div class="nav-item" data-file="tutorial/07-proyectos-ejemplo.md">
+                    <span class="emoji">🚀</span> Proyectos Ejemplo
+                    <span class="time">15 min</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <h3>📚 Anexos</h3>
+                <div class="nav-item" data-file="tutorial/anexos/comandos-referencia.md">
+                    <span class="emoji">📖</span> Comandos Referencia
+                </div>
+                <div class="nav-item" data-file="tutorial/anexos/equivalencias-studio.md">
+                    <span class="emoji">🔄</span> Equivalencias Studio
+                </div>
+                <div class="nav-item" data-file="tutorial/anexos/makefile-completo.md">
+                    <span class="emoji">⚙️</span> Makefile Explicado
+                </div>
+                <div class="nav-item" data-file="tutorial/anexos/script-program.md">
+                    <span class="emoji">🚀</span> Script Program
+                </div>
+                <div class="nav-item" data-file="tutorial/anexos/troubleshooting.md">
+                    <span class="emoji">🔧</span> Troubleshooting
+                </div>
+            </div>
+        </nav>
+
+        <main class="content" id="content">
+            <div class="welcome-screen">
+                <h2>¡Bienvenido al Tutorial Interactivo!</h2>
+                <p>Selecciona cualquier sección del menú lateral para comenzar tu aprendizaje.</p>
+
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>🎯 Guía Paso a Paso</h3>
+                        <p>Tutorial completo con tiempos estimados y verificaciones</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>⚡ Workflow Profesional</h3>
+                        <p>Aprende comandos que usan profesionales reales</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔧 Configuración Completa</h3>
+                        <p>De cero a entorno profesional de desarrollo</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class TutorialViewer {
+            constructor() {
+                this.content = document.getElementById('content');
+                this.progressBar = document.getElementById('progressBar');
+                this.initEventListeners();
+                this.loadedFiles = new Map();
+            }
+
+            initEventListeners() {
+                document.querySelectorAll('.nav-item[data-file]').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.loadFile(item.dataset.file, item);
+                    });
+                });
+            }
+
+            async loadFile(filePath, navItem) {
+                try {
+                    // Actualizar UI
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    navItem.classList.add('active');
+
+                    // Mostrar loading
+                    this.content.innerHTML = '<div class="loading">📄 Cargando contenido...</div>';
+                    this.updateProgress(30);
+
+                    let content;
+                    if (this.loadedFiles.has(filePath)) {
+                        content = this.loadedFiles.get(filePath);
+                    } else {
+                        // Intentar cargar el archivo
+                        try {
+                            const response = await fetch(filePath);
+                            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                            content = await response.text();
+                            this.loadedFiles.set(filePath, content);
+                        } catch (fetchError) {
+                            // Si falla el fetch, usar contenido embebido
+                            content = this.getEmbeddedContent(filePath);
+                        }
+                    }
+
+                    this.updateProgress(70);
+
+                    // Renderizar markdown
+                    const htmlContent = marked.parse(content);
+                    this.content.innerHTML = htmlContent;
+
+                    // Scroll to top
+                    this.content.scrollTop = 0;
+
+                    this.updateProgress(100);
+                    setTimeout(() => this.updateProgress(0), 500);
+
+                } catch (error) {
+                    console.error('Error loading file:', error);
+                    this.content.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Error al cargar el archivo</h3>
+                            <p>No se pudo cargar: <strong>${filePath}</strong></p>
+                            <p>Asegúrate de que el archivo existe y es accesible.</p>
+                            <p><em>Error: ${error.message}</em></p>
+                        </div>
+                    `;
+                }
+            }
+
+            updateProgress(width) {
+                this.progressBar.style.width = width + '%';
+            }
+
+            getEmbeddedContent(filePath) {
+                // Contenido embebido para cuando no se pueden cargar los archivos
+                const embeddedContent = {
+                    'tutorial/README.md': `# 🚀 Tutorial ATmega328P en Mac - Guía Completa
+
+## 👋 ¡Bienvenido estudiante de Ingeniería!
+
+Esta guía te ayudará a **migrar de Microchip Studio (Windows) a un entorno profesional en macOS** para programar microcontroladores ATmega328P en Assembly usando VS Code.
+
+### 🎯 **¿Qué vas a lograr?**
+- ✅ Configurar un entorno de desarrollo **más rápido** que Microchip Studio
+- ✅ Programar ATmega328P con **un solo comando**: \`program archivo.asm\`
+- ✅ Tener **syntax highlighting** y autocompletado profesional
+- ✅ **Workflow optimizado** para desarrollo de microcontroladores
+- ✅ **Estructura de proyecto profesional** con carpetas organizadas
+
+### 📁 **Estructura final que tendrás:**
+\`\`\`
+tu_proyecto/
+├── src/                     # 📝 Tu código fuente (.asm)
+├── build/                   # 🔧 Archivos generados (.hex, .elf, .o)
+├── Makefile                 # ⚙️ Automatización de compilación
+├── program                  # 🚀 Script mágico para programar
+└── .gitignore              # 🗑️ Mantiene tu repo limpio
+\`\`\`
+
+### ⏱️ **Tiempo total estimado:** 45-60 minutos
+
+---
+
+## 📋 **Índice del Tutorial**
+
+Sigue el orden sugerido en el menú lateral para una experiencia de aprendizaje óptima.
+
+**Nota:** Para visualizar el contenido completo de cada archivo, asegúrate de que este archivo HTML esté en la misma carpeta que la carpeta \`tutorial/\`.`,
+
+                    'tutorial/01-requisitos.md': `# ✅ 01 - Requisitos del Sistema
+
+## 📋 **Verificaciones Previas**
+
+### 🖥️ **macOS**
+- ✅ macOS 10.15+ (Catalina o superior)
+- ✅ 4GB+ de RAM disponible
+- ✅ 2GB+ de espacio en disco
+
+### 🔌 **Hardware Necesario**
+- ✅ **Xplain Mini ATmega328P** (recomendado)
+- ✅ Cable USB para conexión
+- ✅ LED y resistencia (opcional para pruebas)
+
+### 💻 **Software que Instalaremos**
+- 🛠️ **Homebrew** - Gestor de paquetes para Mac
+- ⚙️ **AVR Toolchain** - Compilador y herramientas
+- 💻 **VS Code** - Editor profesional
+- 🔧 **AVRDUDE** - Programador de microcontroladores
+
+¡Continúa con la instalación básica!`,
+
+                    'tutorial/02-instalacion-basica.md': `# 🛠️ 02 - Instalación Básica
+
+## **PASO 1: Instalar Homebrew**
+
+\`\`\`bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+\`\`\`
+
+## **PASO 2: Instalar AVR Toolchain**
+
+\`\`\`bash
+brew install avr-gcc avrdude
+\`\`\`
+
+## **PASO 3: Verificar Instalación**
+
+\`\`\`bash
+avr-gcc --version
+avrdude -?
+\`\`\`
+
+¡Listo para el siguiente paso!`,
+
+                    'tutorial/03-workflow-diario.md': `# ⚡ 03 - Tu Workflow Diario
+
+## 🚀 **¡El Comando Mágico!**
+
+\`\`\`bash
+# Tu nuevo comando favorito:
+program mi_archivo.asm
+\`\`\`
+
+**¡Eso es todo!** Un comando que:
+- ✅ **Compila** tu código Assembly
+- ✅ **Programa** el ATmega328P automáticamente
+- ✅ **Verifica** que todo salió bien
+- ✅ **Te dice** si hay errores
+
+## 💡 **Ejemplos Reales**
+
+\`\`\`bash
+# Hacer parpadear un LED
+program simple_blink.asm
+
+# Leer un botón
+program button_test
+
+# Tu proyecto final
+program practica_final
+\`\`\``,
+
+                    'tutorial/04-configurar-vscode.md': `# 💻 04 - Configurar VS Code
+
+## **Instalar VS Code**
+
+1. Descargar desde: https://code.visualstudio.com/
+2. Instalar normalmente
+
+## **Extensiones Esenciales**
+
+\`\`\`
+1. AVR Assembly (syntax highlighting)
+2. Better Comments
+3. Bracket Pair Colorizer
+4. GitLens
+\`\`\`
+
+## **Configurar Tema y Font**
+
+Recomendado: **Dark+ theme** con **Monaco** font para mejor legibilidad del código Assembly.`,
+
+                    'tutorial/05-primer-proyecto.md': `# 🎯 05 - Tu Primer Proyecto
+
+## **PASO 1: Crear Estructura**
+
+\`\`\`bash
+mkdir mi_primer_atmega
+cd mi_primer_atmega
+mkdir src
+\`\`\`
+
+## **PASO 2: Código LED Parpadeante**
+
+Crea \`src/simple_blink.asm\`:
+
+\`\`\`assembly
+.include "m328pdef.inc"
+
+.equ LED_PIN, 5
+
+.text
+.global main
+
+main:
+    ; Configurar stack pointer
+    ldi r16, lo8(RAMEND)
+    out SPL, r16
+    ldi r16, hi8(RAMEND)
+    out SPH, r16
+
+    ; PB5 como salida
+    sbi DDRB, LED_PIN
+
+main_loop:
+    ; Encender LED
+    sbi PORTB, LED_PIN
+    rcall delay
+
+    ; Apagar LED
+    cbi PORTB, LED_PIN
+    rcall delay
+
+    rjmp main_loop
+
+delay:
+    ; Delay simple
+    ldi r18, 20
+delay_loop:
+    ldi r19, 200
+inner_loop:
+    nop
+    dec r19
+    brne inner_loop
+    dec r18
+    brne delay_loop
+    ret
+\`\`\`
+
+## **PASO 3: Programar**
+
+\`\`\`bash
+program simple_blink
+\`\`\`
+
+¡Deberías ver tu LED parpadeando! 🎉`,
+
+                    // Contenido de los anexos
+                    'tutorial/anexos/comandos-referencia.md': `# 📖 Comandos de Referencia Rápida
+
+## 🚀 **Comandos Principales**
+
+### **Compilación y Programación**
+\`\`\`bash
+# El comando todo-en-uno
+program archivo.asm
+
+# Compilar sin programar
+make compile-archivo
+
+# Limpiar archivos generados
+make clean
+
+# Ver tamaño del programa
+make size
+\`\`\`
+
+### **AVR-GCC Directo**
+\`\`\`bash
+# Compilar Assembly
+avr-gcc -mmcu=atmega328p -x assembler-with-cpp -c archivo.asm -o archivo.o
+
+# Enlazar
+avr-gcc -mmcu=atmega328p archivo.o -o archivo.elf
+
+# Crear HEX
+avr-objcopy -O ihex archivo.elf archivo.hex
+
+# Programar con AVRDUDE
+avrdude -c xplainedmini -p atmega328p -P usb -U flash:w:archivo.hex:i
+\`\`\`
+
+### **Verificación de Hardware**
+\`\`\`bash
+# Listar programadores
+avrdude -c ?
+
+# Test de conexión Xplain Mini
+avrdude -c xplainedmini -p atmega328p -P usb
+
+# Leer información del chip
+avrdude -c xplainedmini -p atmega328p -P usb -v
+\`\`\`
+
+## 🛠️ **Comandos de Sistema**
+
+### **Homebrew**
+\`\`\`bash
+# Actualizar herramientas
+brew update && brew upgrade
+
+# Reinstalar AVR toolchain
+brew reinstall avr-gcc avrdude
+\`\`\`
+
+### **Gestión de Archivos**
+\`\`\`bash
+# Ver estructura del proyecto
+tree                 # Instalar con: brew install tree
+
+# Buscar archivos .asm
+find . -name "*.asm"
+
+# Ver archivos generados
+ls -la build/
+\`\`\``,
+
+                    'tutorial/anexos/equivalencias-studio.md': `# 🔄 Equivalencias Microchip Studio → Mac
+
+## 🎯 **Migración Completa de Workflow**
+
+### **Crear Nuevo Proyecto**
+
+| Microchip Studio | Mac Terminal |
+|------------------|--------------|
+| File → New → Project | \`mkdir proyecto && cd proyecto\` |
+| Seleccionar ATmega328P | \`mkdir src\` |
+| Configurar compilador | *Automático con Makefile* |
+
+### **Compilar Proyecto**
+
+| Microchip Studio | Mac |
+|------------------|-----|
+| **Build** → Build Solution (F7) | \`program archivo.asm\` |
+| Ver errores en Output | *Errores se muestran en terminal* |
+| **Build** → Clean Solution | \`make clean\` |
+
+### **Programar Microcontrolador**
+
+| Microchip Studio | Mac |
+|------------------|-----|
+| **Tools** → Device Programming | \`program archivo.asm\` |
+| Seleccionar Tool: Xplain Mini | *Automático* |
+| Apply → Program | *Automático* |
+
+### **Debug y Verificación**
+
+| Microchip Studio | Mac |
+|------------------|-----|
+| **Debug** → Start Debugging | *Usar UART + monitor serie* |
+| Breakpoints | *Usar \`printf\` via UART* |
+| Watch variables | *Enviar valores por serie* |
+| Memory view | \`avr-objdump -h archivo.elf\` |
+
+### **Gestión de Archivos**
+
+| Microchip Studio | Mac |
+|------------------|-----|
+| Solution Explorer | \`tree\` o Finder |
+| Add → Existing Item | \`cp archivo.asm src/\` |
+| Properties | \`ls -la\` |
+
+## 💡 **Ventajas del Setup Mac**
+
+### ✅ **Más Rápido**
+- **Compilación**: ~2-3 segundos vs ~10-15 en Studio
+- **Programación**: ~5 segundos vs ~15-20 en Studio
+- **Startup**: Instantáneo vs ~30 segundos Studio
+
+### ✅ **Más Flexible**
+- **Git integrado**: Control de versiones nativo
+- **Terminal poderoso**: Scripting y automatización
+- **VS Code**: Extensions y customización
+
+### ✅ **Más Profesional**
+- **Workflow industria**: Lo que usan desarrolladores reales
+- **Cross-platform**: El mismo setup funciona en Linux
+- **Makefiles**: Estándar en proyectos grandes
+
+## 🎓 **Tips para Ex-usuarios de Studio**
+
+### **Muscle Memory**
+- **F7** → \`program archivo.asm\`
+- **Ctrl+Shift+B** → \`make all\`
+- **F5** → \`program archivo && make monitor\`
+
+### **Buscar y Reemplazar**
+- **Ctrl+H** → VS Code: \`Cmd+Option+F\`
+- **Go to Definition** → VS Code: \`Cmd+Click\`
+
+### **Project Templates**
+En lugar de templates de Studio, usa:
+\`\`\`bash
+# Template básico
+cp ~/templates/basic_atmega328.asm src/main.asm
+
+# O crea scripts
+./create_project.sh mi_nuevo_proyecto
+\`\`\``,
+
+                    'tutorial/anexos/makefile-completo.md': `# 📋 Makefile Completo Documentado
+
+> **🎯 Objetivo:** Entender cada línea del Makefile para ATmega328P
+> **📋 Nivel:** Intermedio - para estudiantes que quieren personalizar
+
+## 🔧 **Makefile Completo con Documentación**
+
+\`\`\`makefile
+# ===============================================
+# CONFIGURACIÓN DE DIRECTORIOS
+# ===============================================
+# Directorio para archivos fuente (.asm)
+SRC_DIR = src
+
+# Directorio para archivos generados (.o, .elf, .hex)
+BUILD_DIR = build
+
+# ===============================================
+# CONFIGURACIÓN DEL PROYECTO
+# ===============================================
+# Especificar microcontrolador objetivo
+MCU = atmega328p
+
+# Frecuencia del cristal/reloj (importante para delays)
+F_CPU = 16000000UL
+
+# Nombre del archivo principal (cambia según tu proyecto)
+TARGET = main
+
+# ===============================================
+# HERRAMIENTAS DEL TOOLCHAIN
+# ===============================================
+# Compilador para AVR (convierte Assembly → objeto)
+CC = avr-gcc
+
+# Conversor de formato (ELF → HEX)
+OBJCOPY = avr-objcopy
+
+# Programador (sube código al microcontrolador)
+AVRDUDE = avrdude
+
+# ===============================================
+# FLAGS DEL COMPILADOR
+# ===============================================
+ASFLAGS = -mmcu=\$(MCU) \\
+          -I. \\
+          -x assembler-with-cpp \\
+          -g
+
+# ===============================================
+# TARGETS PRINCIPALES
+# ===============================================
+
+# Crear directorio build si no existe
+\$(BUILD_DIR):
+	@mkdir -p \$(BUILD_DIR)
+
+# Compilar archivo específico
+compile-%: \$(SRC_DIR)/%.asm | \$(BUILD_DIR)
+	\$(CC) \$(ASFLAGS) -c \$< -o \$(BUILD_DIR)/\$*.o
+	\$(CC) -mmcu=\$(MCU) \$(BUILD_DIR)/\$*.o -o \$(BUILD_DIR)/\$*.elf
+	\$(OBJCOPY) -O ihex \$(BUILD_DIR)/\$*.elf \$(BUILD_DIR)/\$*.hex
+
+# Programar archivo específico
+program-xplain-%: \$(BUILD_DIR)/%.hex
+	\$(AVRDUDE) -c xplainedmini -p \$(MCU) -P usb -U flash:w:\$<:i
+
+# Limpiar archivos generados
+clean:
+	rm -rf \$(BUILD_DIR)
+
+# Ver tamaño de programa
+size: \$(BUILD_DIR)/\$(TARGET).elf
+	avr-size --format=avr --mcu=\$(MCU) \$<
+
+.PHONY: clean size
+\`\`\`
+
+## 📁 **Estructura de Directorios Profesional**
+
+**El Makefile está diseñado para mantener tu proyecto organizado:**
+
+\`\`\`
+tu_proyecto/
+├── src/                     # 📝 Código fuente (.asm)
+│   ├── simple_blink.asm
+│   ├── main.asm
+│   └── button_test.asm
+├── build/                   # 🔧 Archivos generados (auto-creado)
+│   ├── simple_blink.o
+│   ├── simple_blink.elf
+│   ├── simple_blink.hex
+│   └── simple_blink.lst
+├── Makefile                 # ⚙️ Este archivo
+├── program                  # 🚀 Script de programación
+└── .gitignore              # 🗑️ Para Git (excluir build/)
+\`\`\`
+
+### 📋 **Ventajas de esta estructura:**
+
+- **Limpio:** Archivos fuente separados de generados
+- **Profesional:** Estándar en la industria
+- **Git-friendly:** Easy \`.gitignore\` para \`build/\`
+- **Escalable:** Fácil agregar más archivos fuente
+
+### 🔧 **El Makefile auto-crea directorios:**
+
+\`\`\`makefile
+# Crear directorio build/ si no existe
+\$(BUILD_DIR):
+	@mkdir -p \$(BUILD_DIR)
+
+# Todas las compilaciones dependen de que exista build/
+%.o: \$(SRC_DIR)/%.asm | \$(BUILD_DIR)
+	\$(CC) \$(ASFLAGS) -c \$< -o \$(BUILD_DIR)/\$@
+\`\`\`
+
+## 🎯 **Comandos de Ejemplo**
+
+\`\`\`bash
+# Compilar specific file
+make compile-simple_blink
+
+# Programar specific file
+make program-xplain-simple_blink
+
+# Ver tamaño
+make size
+
+# Limpiar todo
+make clean
+\`\`\``,
+
+                    'tutorial/anexos/script-program.md': `# 🚀 Script Program - Explicación Línea por Línea
+
+> **🎯 Objetivo:** Entender completamente cómo funciona el script \`program\`
+> **📋 Nivel:** Intermedio - para estudiantes que quieren personalizar
+
+## 🌟 **Características Principales**
+
+### ✨ **Búsqueda Inteligente de Archivos**
+- 🔍 Busca primero en \`src/\` (estructura profesional)
+- 🔄 Fallback al directorio actual (compatibilidad)
+- 📁 Crea automáticamente \`build/\` para archivos generados
+
+### ⚡ **Proceso Automatizado**
+1. **Compilar** Assembly → Objeto (.o)
+2. **Enlazar** Objeto → Ejecutable (.elf)
+3. **Convertir** ELF → HEX para programar
+4. **Programar** directamente al microcontrolador
+5. **Verificar** que todo funcionó
+
+## 🔧 **Configuración Principal**
+
+\`\`\`bash
+# Tipo de microcontrolador objetivo
+MCU="atmega328p"
+
+# Tipo de programador para Xplain Mini
+PROGRAMMER="xplainedmini"
+
+# Puerto de comunicación
+PORT="usb"
+\`\`\`
+
+## 🎨 **Sistema de Colores**
+
+\`\`\`bash
+GREEN='\\033[0;32m'      # Verde para éxito ✅
+RED='\\033[0;31m'        # Rojo para errores ❌
+YELLOW='\\033[1;33m'     # Amarillo para procesos ⚠️
+BLUE='\\033[0;34m'       # Azul para información ℹ️
+\`\`\`
+
+## 🔍 **Lógica de Búsqueda de Archivos**
+
+\`\`\`bash
+# Buscar primero en src/ (estructura preferida)
+if [ -f "src/\$FILE" ]; then
+    SOURCE_FILE="src/\$FILE"
+    echo "ℹ️ Archivo encontrado en estructura profesional: src/\$FILE"
+
+# Si no está en src/, buscar en directorio actual (compatibilidad)
+elif [ -f "\$FILE" ]; then
+    SOURCE_FILE="\$FILE"
+    echo "⚠️ Archivo encontrado en directorio actual: \$FILE"
+    echo "💡 Sugerencia: Considera mover archivos .asm a carpeta src/"
+\`\`\`
+
+## 📁 **Gestión Automática de Directorios**
+
+\`\`\`bash
+BUILD_DIR="build"
+
+# Crear directorio build/ si no existe
+if [ ! -d "\$BUILD_DIR" ]; then
+    echo "📁 Creando directorio build/ para archivos generados..."
+    mkdir -p "\$BUILD_DIR"
+fi
+\`\`\`
+
+## ⚙️ **Proceso de Compilación**
+
+### **Paso 1: Assembly → Objeto**
+\`\`\`bash
+avr-gcc -mmcu="\$MCU" \\
+        -I. \\
+        -x assembler-with-cpp \\
+        -g \\
+        -c "\$SOURCE_FILE" \\
+        -o "\$BUILD_DIR/\${BASENAME}.o"
+\`\`\`
+
+### **Paso 2: Enlazado**
+\`\`\`bash
+avr-gcc -mmcu="\$MCU" \\
+        "\$BUILD_DIR/\${BASENAME}.o" \\
+        -o "\$BUILD_DIR/\${BASENAME}.elf"
+\`\`\`
+
+### **Paso 3: Conversión a HEX**
+\`\`\`bash
+avr-objcopy -j .text \\
+            -j .data \\
+            -O ihex \\
+            "\$BUILD_DIR/\${BASENAME}.elf" \\
+            "\$BUILD_DIR/\${BASENAME}.hex"
+\`\`\`
+
+### **Paso 4: Programación**
+\`\`\`bash
+avrdude -c "\$PROGRAMMER" \\
+        -p "\$MCU" \\
+        -P "\$PORT" \\
+        -U flash:w:"\$BUILD_DIR/\${BASENAME}.hex":i
+\`\`\`
+
+## 📊 **Análisis de Tamaño**
+
+\`\`\`bash
+# Mostrar cuánta memoria usa el programa
+avr-size --format=avr \\
+         --mcu="\$MCU" \\
+         "\$BUILD_DIR/\${BASENAME}.elf"
+\`\`\`
+
+## 🎯 **Ventajas vs Compilación Manual**
+
+| Aspecto | Manual | Script \`program\` |
+|---------|--------|-------------------|
+| **Comandos** | 4+ comandos | 1 comando |
+| **Errores** | Fácil equivocarse | Manejo automático |
+| **Organización** | Archivos mezclados | Estructura profesional |
+| **Tiempo** | ~2-3 minutos | ~10 segundos |
+| **Debugging** | Difícil | Mensajes claros |
+
+## 💡 **Personalización**
+
+### **Cambiar Microcontrolador**
+\`\`\`bash
+# Para ATmega168
+MCU="atmega168"
+
+# Para ATmega32u4
+MCU="atmega32u4"
+\`\`\`
+
+### **Agregar Más Funciones**
+\`\`\`bash
+# Función para generar listado
+generate_listing() {
+    avr-objdump -h -S "\$BUILD_DIR/\${BASENAME}.elf" > "\$BUILD_DIR/\${BASENAME}.lst"
+    echo "📄 Listado generado: build/\${BASENAME}.lst"
+}
+\`\`\``,
+
+                    'tutorial/anexos/troubleshooting.md': `# 🔧 Troubleshooting - Solución de Problemas
+
+## ❌ **Errores Comunes y Soluciones**
+
+### **1. "avr-gcc: command not found"**
+
+**Problema:** AVR toolchain no instalado o no en PATH
+
+**Soluciones:**
+\`\`\`bash
+# Verificar instalación
+which avr-gcc
+
+# Si no está instalado
+brew install avr-gcc
+
+# Si está instalado but no en PATH
+echo 'export PATH="/opt/homebrew/bin:\$PATH"' >> ~/.zshrc
+source ~/.zshrc
+\`\`\`
+
+### **2. "avrdude: can't find programmer"**
+
+**Problema:** Xplain Mini no detectada
+
+**Soluciones:**
+\`\`\`bash
+# Verificar conexión USB
+system_profiler SPUSBDataType | grep -i xplain
+
+# Test de conexión
+avrdude -c xplainedmini -p atmega328p -P usb
+
+# Si no funciona, reconectar USB y reintentar
+\`\`\`
+
+### **3. Errores de Compilación Assembly**
+
+**Problema:** Sintaxis incorrecta en código .asm
+
+**Errores típicos:**
+- \`Error: expected comma after "LED_PIN"\` → Usar \`LED_PIN, 5\` no \`LED_PIN = 5\`
+- \`Error: unknown pseudo-op: '.cseg'\` → Usar \`.text\` en lugar de \`.cseg\`
+- \`Error: constant value required\` → Verificar definiciones en m328pdef.inc
+
+**Solución:**
+\`\`\`bash
+# Verificar sintaxis en archivo de definiciones
+cat src/m328pdef.inc | head -20
+
+# Ejemplo correcto de definición:
+.equ LED_PIN, 5    # ✅ Correcto
+.equ LED_PIN = 5   # ❌ Incorrecto en avr-gcc
+\`\`\`
+
+### **4. "Permission denied" al ejecutar script**
+
+**Problema:** Script program no tiene permisos de ejecución
+
+**Solución:**
+\`\`\`bash
+# Dar permisos de ejecución
+chmod +x program
+
+# Verificar permisos
+ls -la program
+# Debería mostrar: -rwxr-xr-x
+\`\`\`
+
+### **5. "No such file or directory: src/archivo.asm"**
+
+**Problema:** Estructura de directorios incorrecta
+
+**Solución:**
+\`\`\`bash
+# Verificar estructura
+ls -la
+tree  # Si tienes tree instalado
+
+# Crear estructura correcta
+mkdir -p src
+mv *.asm src/  # Mover archivos .asm a src/
+
+# O compilar desde directorio actual
+./program ./mi_archivo.asm
+\`\`\`
+
+## 🔍 **Comandos de Diagnóstico**
+
+### **Verificar Instalación Completa**
+\`\`\`bash
+# Verificar todas las herramientas
+avr-gcc --version
+avrdude -?
+make --version
+
+# Verificar homebrew
+brew doctor
+\`\`\`
+
+### **Test Hardware**
+\`\`\`bash
+# Información detallada del chip
+avrdude -c xplainedmini -p atmega328p -P usb -v
+
+# Leer fuses del microcontrolador
+avrdude -c xplainedmini -p atmega328p -P usb -U lfuse:r:lfuse.hex:h
+\`\`\`
+
+### **Debug del Script**
+\`\`\`bash
+# Ejecutar script con debug mode
+bash -x program simple_blink
+
+# Ver variables de entorno
+env | grep PATH
+\`\`\`
+
+## 💊 **Soluciones Rápidas**
+
+### **Reset Completo del Entorno**
+\`\`\`bash
+# Reinstalar toolchain
+brew uninstall avr-gcc avrdude
+brew install avr-gcc avrdude
+
+# Limpiar caché de compilación
+make clean
+rm -rf build/
+
+# Recargar configuración shell
+source ~/.zshrc
+\`\`\`
+
+### **Verificar Archivos Críticos**
+\`\`\`bash
+# Verificar Makefile existe y es correcto
+ls -la Makefile
+head -10 Makefile
+
+# Verificar script program
+ls -la program
+head -20 program
+\`\`\`
+
+## 📱 **Contacto y Ayuda**
+
+### **Información del Sistema**
+Al reportar problemas, incluye:
+
+\`\`\`bash
+# Versión de macOS
+sw_vers
+
+# Versión herramientas
+avr-gcc --version
+avrdude -? 2>&1 | head -1
+
+# Información USB (con Xplain conectada)
+system_profiler SPUSBDataType | grep -A5 -B5 -i xplain
+\`\`\`
+
+### **Logs Útiles**
+\`\`\`bash
+# Log completo de compilación
+./program archivo.asm 2>&1 | tee debug.log
+
+# Log de avrdude solamente
+avrdude -c xplainedmini -p atmega328p -P usb -v 2>&1 | tee avrdude.log
+\`\`\`
+
+## 🎯 **Prevención de Problemas**
+
+### **Buenas Prácticas**
+- ✅ Siempre usar estructura \`src/\` y \`build/\`
+- ✅ Hacer \`make clean\` antes de reportar errores
+- ✅ Verificar conexión USB antes de programar
+- ✅ Mantener backup de archivos .asm
+- ✅ Usar control de versiones (Git)
+
+### **Checklist Pre-Compilación**
+1. ¿Archivo .asm existe en \`src/\`?
+2. ¿Script program tiene permisos +x?
+3. ¿Xplain Mini conectada y detectada?
+4. ¿Sintaxis Assembly correcta?
+5. ¿Definiciones m328pdef.inc actualizadas?`
+                };
+
+                return embeddedContent[filePath] || `# ❌ Contenido no disponible
+
+Lo siento, el contenido para **${filePath}** no está disponible en modo offline.
+
+## 💡 Solución
+
+Para ver todo el contenido:
+
+1. Asegúrate de que este archivo HTML esté en la carpeta raíz del proyecto
+2. Verifica que existe la carpeta \`tutorial/\` con todos los archivos .md
+3. Si usas un servidor web local, todos los archivos se cargarán automáticamente
+
+## 📁 Estructura esperada:
+\`\`\`
+tu_proyecto/
+├── tutorial-viewer.html    # Este archivo
+├── tutorial/
+│   ├── README.md
+│   ├── 01-requisitos.md
+│   ├── 02-instalacion-basica.md
+│   └── ... (otros archivos)
+└── src/
+\`\`\``;
+            }
+        }
+
+        // Inicializar cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', () => {
+            new TutorialViewer();
+        });
+    </script>
+</body>
+</html>

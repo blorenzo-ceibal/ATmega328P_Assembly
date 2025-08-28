@@ -1,0 +1,254 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build ASM",
+            "type": "shell",
+            "command": "make",
+            "args": ["all"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": {
+                "owner": "avr-gcc",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(.+):(\\d+):(\\d+):\\s+(warning|error):\\s+(.+)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            },
+            "icon": {
+                "id": "tools",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "label": "Program ATmega328P (Xplain Mini)",
+            "type": "shell",
+            "command": "make",
+            "args": ["program-xplain"],
+            "group": "test",
+            "dependsOn": "Build ASM",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "icon": {
+                "id": "debug-alt",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "Program ATmega328P (Arduino)",
+            "type": "shell",
+            "command": "make",
+            "args": ["program-arduino"],
+            "group": "test",
+            "dependsOn": "Build ASM",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "icon": {
+                "id": "debug-alt",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "make",
+            "args": ["clean"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            },
+            "icon": {
+                "id": "trash",
+                "color": "terminal.ansiRed"
+            }
+        },
+        {
+            "label": "Serial Monitor",
+            "type": "shell",
+            "command": "make",
+            "args": ["monitor"],
+            "isBackground": false,
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": false
+            },
+            "runOptions": {
+                "instanceLimit": 1
+            },
+            "icon": {
+                "id": "device-desktop",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        {
+            "label": "Show Program Size",
+            "type": "shell",
+            "command": "make",
+            "args": ["size"],
+            "group": "build",
+            "dependsOn": "Build ASM",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "icon": {
+                "id": "graph",
+                "color": "terminal.ansiMagenta"
+            }
+        },
+        {
+            "label": "Test Xplain Connection",
+            "type": "shell",
+            "command": "make",
+            "args": ["test-xplain"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "icon": {
+                "id": "plug",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "List Serial Ports",
+            "type": "shell",
+            "command": "make",
+            "args": ["list-ports"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "icon": {
+                "id": "list-unordered",
+                "color": "terminal.ansiWhite"
+            }
+        },
+        {
+            "label": "Read Fuses",
+            "type": "shell",
+            "command": "make",
+            "args": ["fuses"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "icon": {
+                "id": "info",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "label": "MCU Info",
+            "type": "shell",
+            "command": "make",
+            "args": ["info"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "icon": {
+                "id": "info",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        {
+            "label": "Install Dependencies",
+            "type": "shell",
+            "command": "make",
+            "args": ["install-deps"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "icon": {
+                "id": "cloud-download",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        {
+            "label": "Verify Tools",
+            "type": "shell",
+            "command": "make",
+            "args": ["verify-tools"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "icon": {
+                "id": "check",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "Development Workflow",
+            "type": "shell",
+            "command": "make",
+            "args": ["dev"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "icon": {
+                "id": "rocket",
+                "color": "terminal.ansiGreen"
+            }
+        }
+    ]
+}

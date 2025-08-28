@@ -1,0 +1,120 @@
+#!/bin/bash
+
+# ==================== SCRIPT DE PROGRAMACIÓN AUTOMÁTICA ====================
+# Programa cualquier archivo .asm en ATmega328P con Xplain Mini
+# Uso: ./program archivo.asm
+#      ./program simple_blink
+#      ./program main.asm
+# ==================== CONFIGURACIÓN ====================
+
+MCU="atmega328p"
+PROGRAMMER="xplainedmini"
+PORT="usb"
+
+# Colores para output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# ==================== FUNCIONES ====================
+
+show_help() {
+    echo -e "${GREEN}🚀 Script de programación automática para ATmega328P${NC}"
+    echo -e "${YELLOW}📋 Uso:${NC}"
+    echo "  ./program archivo.asm     - Programa archivo.asm"
+    echo "  ./program archivo         - Programa archivo.asm (agrega .asm automáticamente)"
+    echo "  ./program -h              - Esta ayuda"
+    echo ""
+    echo -e "${YELLOW}💡 Ejemplos:${NC}"
+    echo "  ./program simple_blink    - Compila y programa simple_blink.asm"
+    echo "  ./program main.asm        - Compila y programa main.asm"
+    echo "  ./program test            - Compila y programa test.asm"
+    echo ""
+    echo -e "${BLUE}⚙️  Hardware soportado:${NC}"
+    echo "  - Xplain Mini ATmega328P"
+    echo "  - Programador: ${PROGRAMMER}"
+    echo "  - Puerto: ${PORT}"
+}
+
+error_exit() {
+    echo -e "${RED}❌ Error: $1${NC}" >&2
+    exit 1
+}
+
+program_chip() {
+    local hex_file="$1"
+
+    echo -e "${YELLOW}🚀 Programando ATmega328P via Xplain Mini...${NC}"
+    echo -e "${BLUE}ℹ️  Asegúrate de que la Xplain Mini esté conectada${NC}"
+
+    avrdude -c "$PROGRAMMER" -p "$MCU" -P "$PORT" -U flash:w:"$hex_file":i || error_exit "Error programando el chip"
+
+    echo -e "${GREEN}✅ Programación exitosa!${NC}"
+}
+
+# ==================== PROGRAMA PRINCIPAL ====================
+
+# Verificar argumentos
+if [ $# -eq 0 ]; then
+    echo -e "${RED}❌ Error: Falta el nombre del archivo${NC}"
+    echo ""
+    show_help
+    exit 1
+fi
+
+# Mostrar ayuda
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    show_help
+    exit 0
+fi
+
+# Obtener nombre del archivo
+FILE="$1"
+
+# Agregar extensión .asm si no la tiene
+if [[ "$FILE" != *.asm ]]; then
+    FILE="${FILE}.asm"
+fi
+
+# Buscar archivo en src/ o en raíz
+if [ -f "src/$FILE" ]; then
+    FILEPATH="src/$FILE"
+elif [ -f "$FILE" ]; then
+    FILEPATH="$FILE"
+else
+    error_exit "Archivo '$FILE' no encontrado en src/ ni en raíz"
+fi
+
+# Compilar
+echo -e "${GREEN}🎯 Procesando archivo: $FILEPATH${NC}"
+
+BASENAME=$(basename "$FILE" .asm)
+
+# Crear carpeta build si no existe
+BUILD_DIR="build"
+mkdir -p "$BUILD_DIR"
+
+echo -e "${YELLOW}📦 Compilando $FILEPATH...${NC}"
+
+# Compilar (archivos generados van a build/)
+avr-gcc -mmcu="$MCU" -Isrc -I. -x assembler-with-cpp -g -c "$FILEPATH" -o "${BUILD_DIR}/${BASENAME}.o" || error_exit "Error en compilación"
+
+# Enlazar
+avr-gcc -mmcu="$MCU" "${BUILD_DIR}/${BASENAME}.o" -o "${BUILD_DIR}/${BASENAME}.elf" || error_exit "Error en enlazado"
+
+# Crear HEX
+avr-objcopy -j .text -j .data -O ihex "${BUILD_DIR}/${BASENAME}.elf" "${BUILD_DIR}/${BASENAME}.hex" || error_exit "Error creando HEX"
+
+# Mostrar tamaño
+echo -e "${BLUE}📏 Tamaño del programa:${NC}"
+avr-size --format=avr --mcu="$MCU" "${BUILD_DIR}/${BASENAME}.elf"
+
+echo -e "${GREEN}✅ Compilación exitosa: ${BUILD_DIR}/${BASENAME}.hex${NC}"
+
+# Programar
+program_chip "${BUILD_DIR}/${BASENAME}.hex"
+
+echo -e "${GREEN}🎉 ¡Proceso completado exitosamente!${NC}"
+echo -e "${BLUE}💡 Tu código está ahora ejecutándose en el ATmega328P${NC}"
