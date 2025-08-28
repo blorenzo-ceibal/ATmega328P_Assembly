@@ -1,83 +1,85 @@
 # 🎯 05 - Tu Primer Proyecto
 
 > **⏱️ Tiempo estimado:** 10 minutos
-> **🎯 Objetivo:** Crear tu primer proyecto completo: LED parpadeante funcional
+> **🎯 Objetivo:** Probar tu primer proyecto completo: LED parpadeante funcional
 > **📋 Prerequisito:** Haber completado [04-configurar-vscode.md](04-configurar-vscode.md)
 
 ## 🚀 **¡El Momento de la Verdad!**
 
-Vamos a crear un proyecto completo desde cero que **realmente funcione** en tu Xplain Mini.
+Vamos a usar el proyecto que ya descargaste para **programar tu primer microcontrolador** en tu Xplain Mini.
 
 **Al final de este paso tendrás:**
 - ✅ Un LED parpadeando en tu hardware
-- ✅ El comando `program simple_blink` funcionando
+- ✅ El comando `./program simple_blink` funcionando
 - ✅ Toda la configuración verificada y lista
 
 ---
 
-## 📁 **PASO 1: Crear Estructura del Proyecto (2 min)**
+## 📁 **PASO 1: Verificar Estructura del Proyecto (2 min)**
 
-### 🔧 **Crear directorio de trabajo:**
+### 🔧 **Navegar al proyecto descargado:**
 
 ```bash
-# Crear directorio principal (puedes cambiar la ruta si prefieres)
-mkdir -p ~/Desktop/ATmega328P_Assembly
+# Ir al directorio del proyecto (ajusta la ruta si lo clonaste en otro lugar)
 cd ~/Desktop/ATmega328P_Assembly
-
-# Crear estructura profesional
-mkdir src                    # Para tu código fuente
 
 # Verificar que estás en el lugar correcto
 pwd
 # Deberías ver: /Users/tuusuario/Desktop/ATmega328P_Assembly
 ```
 
-### 🔧 **Crear archivos del proyecto:**
+### 🔧 **Verificar que tienes todos los archivos:**
 
 ```bash
-# Crear archivos principales
-touch Makefile
-touch src/simple_blink.asm   # ¡Nota que va en src/!
-touch program
-
-# Hacer el script ejecutable
-chmod +x program
-
-# Verificar estructura
+# Ver estructura principal
 ls -la
-# Deberías ver: Makefile  program  src/
+# Deberías ver: Makefile, program, src/, tutorial/, build/
 
+# Ver código fuente disponible
 ls src/
-# Deberías ver: simple_blink.asm
+# Deberías ver: simple_blink.asm, blink2.asm, m328pdef.inc
+
+# Verificar que el script es ejecutable
+ls -la program
+# Deberías ver: -rwxr-xr-x ... program (con 'x' de ejecutable)
 ```
 
-Tu estructura quedará así:
+Tu estructura ya está completa:
 ```
 ATmega328P_Assembly/
-├── src/                     # 📝 Tu código fuente (.asm)
-│   └── simple_blink.asm    # Tu programa
+├── src/                     # 📝 Código fuente (.asm)
+│   ├── simple_blink.asm    # ← Tu primer programa
+│   ├── blink2.asm          # ← Programa más avanzado
+│   └── m328pdef.inc        # ← Definiciones del micro
+├── build/                   # 🔧 Archivos generados
 ├── Makefile                 # ⚙️ Automatización
 └── program                  # 🚀 Script para programar
 ```
 
 ---
 
-## 📝 **PASO 2: Crear el Código Assembly (3 min)**
+## 📝 **PASO 2: Examinar el Código Assembly (3 min)**
 
-### 🔧 **Escribir código del LED parpadeante:**
+### 🔧 **Abrir VS Code en el proyecto:**
 
 ```bash
 # Abrir VS Code en la carpeta actual
 code .
 
-# O abrir directamente el archivo
+# O abrir directamente el archivo principal
 code src/simple_blink.asm
 ```
 
-### 🎨 **Verificar syntax highlighting:**
+### 🎨 **Examinar el código existente:**
 
-```bash
-# Abrir en VS Code para verificar colores
+El archivo `src/simple_blink.asm` ya contiene un programa funcional. **Ábrelo en VS Code** y verás:
+
+- 🟢 **Verde:** Comentarios explicativos
+- 🔵 **Azul:** Directivas del assembler (#include, .equ, .text)
+- 🟡 **Amarillo:** Etiquetas (main:, delay:)
+- 🟣 **Púrpura:** Instrucciones del procesador (ldi, out, rcall, etc.)
+
+**💡 No necesitas escribir código ahora** - el archivo ya está listo para usar. Solo examina cómo está estructurado.
 code simple_blink.asm
 ```
 
@@ -90,112 +92,34 @@ code simple_blink.asm
 
 ---
 
-## ⚙️ **PASO 3: Crear el Makefile (2 min)**
+## ⚙️ **PASO 3: Programar el Microcontrolador (5 min)**
 
-### 🔧 **Makefile completo y funcional:**
+### 🔧 **¡El momento de la verdad! Conectar hardware:**
+
+1. **Conecta tu Xplain Mini** al Mac con cable USB
+2. **Verifica que el LED de power** esté encendido (luz verde/azul)
+3. **El Mac debería detectar** automáticamente el dispositivo
+
+### 🚀 **Programar usando el script automatizado:**
 
 ```bash
-cat > Makefile << 'EOF'
-# Makefile para ATmega328P en Xplain Mini con macOS
-MCU = atmega328p
-F_CPU = 16000000UL
-TARGET = main
+# El comando mágico - programa tu primer microcontrolador
+./program simple_blink
 
-# Herramientas
-CC = avr-gcc
-OBJCOPY = avr-objcopy
-OBJDUMP = avr-objdump
-SIZE = avr-size
-AVRDUDE = avrdude
+# Deberías ver mensajes como:
+# 🚀 Programando ATmega328P via Xplain Mini...
+# ✅ Compilación exitosa
+# ✅ Programación completa
+```
 
-# Flags del compilador
-ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp
+**⏳ Esto tardará 10-20 segundos.** Es normal ver mucho texto.
 
-# Configuración del programador para Xplain Mini
-PROGRAMMER = xplainedmini
-PORT = usb
-AVRDUDE_FLAGS = -c $(PROGRAMMER) -p $(MCU) -P $(PORT) -v
+### ✅ **¡MOMENTO DE CELEBRACIÓN!**
 
-# Archivos
-ASM_SOURCES = $(TARGET).asm
-OBJECTS = $(ASM_SOURCES:.asm=.o)
-ELF = $(TARGET).elf
-HEX = $(TARGET).hex
-LST = $(TARGET).lst
-
-# Colores para output
-GREEN = \033[0;32m
-RED = \033[0;31m
-YELLOW = \033[1;33m
-NC = \033[0m
-
-.PHONY: all clean program program-xplain size help
-
-# Target por defecto
-all: $(HEX) $(LST) size
-
-# Patrón para compilar cualquier archivo .asm
-%.o: %.asm
-	@echo "$(YELLOW)Compilando $<...$(NC)"
-	$(CC) $(ASFLAGS) -c $< -o $@
-
-# Crear archivo ELF
-$(ELF): $(OBJECTS)
-	@echo "$(YELLOW)Enlazando...$(NC)"
-	$(CC) -mmcu=$(MCU) $^ -o $@
-
-# Crear archivo HEX
-$(HEX): $(ELF)
-	@echo "$(YELLOW)Creando archivo HEX...$(NC)"
-	$(OBJCOPY) -j .text -j .data -O ihex $< $@
-	@echo "$(GREEN)✓ Compilación exitosa!$(NC)"
-
-# Crear listado
-$(LST): $(ELF)
-	@echo "$(YELLOW)Creando listado...$(NC)"
-	$(OBJDUMP) -h -S $< > $@
-
-# Mostrar tamaño
-size: $(ELF)
-	@echo "$(YELLOW)Tamaño del programa:$(NC)"
-	$(SIZE) --format=avr --mcu=$(MCU) $<
-
-# Targets flexibles - programar cualquier archivo
-program-xplain-%: %.hex
-	@echo "$(YELLOW)Programando $*.asm via Xplain Mini...$(NC)"
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -U flash:w:$<:i
-	@echo "$(GREEN)✓ Programación exitosa!$(NC)"
-
-# Target para compilar cualquier archivo
-compile-%: %.asm
-	@echo "$(YELLOW)Compilando $<...$(NC)"
-	$(CC) $(ASFLAGS) -c $< -o $*.o
-	$(CC) -mmcu=$(MCU) $*.o -o $*.elf
-	$(OBJCOPY) -j .text -j .data -O ihex $*.elf $*.hex
-	$(SIZE) --format=avr --mcu=$(MCU) $*.elf
-	@echo "$(GREEN)✓ $*.hex listo!$(NC)"
-
-# Programar usando Xplain Mini
-program-xplain: $(HEX)
-	@echo "$(YELLOW)Programando ATmega328P via Xplain Mini...$(NC)"
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -U flash:w:$<:i
-	@echo "$(GREEN)✓ Programación exitosa!$(NC)"
-
-# Limpiar archivos generados
-clean:
-	@echo "$(YELLOW)Limpiando archivos...$(NC)"
-	rm -f *.o *.elf *.hex *.lst
-
-# Ayuda
-help:
-	@echo "$(GREEN)Makefile para ATmega328P en macOS$(NC)"
-	@echo "$(YELLOW)Targets disponibles:$(NC)"
-	@echo "  all                    - Compilar todo"
-	@echo "  program-xplain-ARCHIVO - Programar ARCHIVO.asm via Xplain Mini"
-	@echo "  compile-ARCHIVO        - Solo compilar ARCHIVO.asm"
-	@echo "  clean                  - Limpiar archivos"
-	@echo ""
-	@echo "$(GREEN)Ejemplo: make program-xplain-simple_blink$(NC)"
+**Si todo salió bien, deberías ver:**
+- 🟢 **LED parpadeando** en tu Xplain Mini (cada segundo aproximadamente)
+- 💻 **Mensaje "Programación exitosa"** en la terminal
+- 🎉 **¡Tu primer microcontrolador funcionando!**
 EOF
 ```
 
@@ -291,49 +215,29 @@ chmod +x program
 
 ---
 
-## ⚡ **PASO 5: Primera Prueba - ¡El Momento de la Verdad! (1 min)**
+## 🔍 **PASO 4: Probar Programa Más Avanzado (2 min)**
 
-### 🔌 **Verificar hardware:**
-
-1. **Conecta tu Xplain Mini** al Mac vía USB
-2. **Verifica que se detecta:**
+### � **Probar el segundo ejemplo incluido:**
 
 ```bash
-# Test de detección (debe mostrar información)
-system_profiler SPUSBDataType | grep -i "edbg\|xplain"
+# Programa más sofisticado con efectos
+./program blink2
 
-# Test de comunicación
-avrdude -c xplainedmini -p atmega328p -P usb -v
+# Deberías ver el mismo proceso pero con un programa diferente
 ```
 
-**✅ Si ves información del dispositivo y del chip, ¡estás listo!**
+**✅ Este programa hace que el LED parpadee con un patrón más complejo.** ¡Compara los dos para ver la diferencia!
 
-### 🚀 **¡El gran momento!**
+### � **Explorar archivos generados:**
 
 ```bash
-# El comando mágico - tu primer programa
-./program simple_blink
-```
+# Ver archivos que se crearon
+ls build/
+# Deberías ver: simple_blink.hex, simple_blink.elf, simple_blink.o, blink2.hex, etc.
 
-**✅ Si todo funciona deberías ver:**
-
+# Ver tamaño de los programas
+make size
 ```
-🎯 Procesando archivo: simple_blink.asm
-📦 Compilando simple_blink.asm...
-📏 Tamaño del programa:
-AVR Memory Usage
-----------------
-Device: atmega328p
-Program:     174 bytes (0.5% Full)
-✅ Compilación exitosa: simple_blink.hex
-🚀 Programando ATmega328P via Xplain Mini...
-Writing | ################################################## | 100%
-✅ Programación exitosa!
-🎉 ¡Proceso completado exitosamente!
-💡 Tu código está ahora ejecutándose en el ATmega328P
-```
-
-**🎉 ¡Y el LED en tu Xplain Mini debe estar parpadeando!**
 
 ---
 
@@ -343,17 +247,17 @@ Writing | ################################################## | 100%
 
 - [ ] **LED parpadeando:** El LED en la Xplain Mini parpadea cada ~500ms
 - [ ] **Comando funciona:** `./program simple_blink` ejecuta sin errores
-- [ ] **Archivos generados:** Existen `simple_blink.hex`, `.elf`, `.o`
-- [ ] **Tamaño razonable:** Programa ocupa ~174 bytes (menos de 1%)
+- [ ] **Archivos generados:** Existen archivos en `build/`
+- [ ] **Tamaño razonable:** Programa ocupa menos de 1% de la memoria
 
 ### 🛠️ **Comandos adicionales que ahora funcionan:**
 
 ```bash
 # Probar otros comandos
-make help                           # Ver ayuda del Makefile
-make program-xplain-simple_blink   # Programar usando Makefile
-make clean                         # Limpiar archivos
-make compile-simple_blink          # Solo compilar (sin programar)
+make help                    # Ver ayuda del Makefile
+./program -h                # Ver ayuda del script
+make clean                  # Limpiar archivos generados
+make size                   # Ver tamaño del programa
 ```
 
 ### 📊 **¡Tu progreso COMPLETADO!:**

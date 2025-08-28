@@ -10,74 +10,28 @@ Con tu entorno configurado, ahora puedes crear **cualquier proyecto** para ATmeg
 
 ---
 
-## 🚀 **Proyecto 1: LED con Velocidad Variable (5 min)**
+## 🚀 **Proyecto 1: Explorar los Ejemplos Incluidos (5 min)**
 
-### 📝 **Código - blink_variable.asm:**
+### 📝 **Probar los programas incluidos:**
 
 ```bash
-cat > blink_variable.asm << 'EOF'
-; ===============================================
-; BLINK LED CON VELOCIDAD VARIABLE - ATmega328P
-; ===============================================
-; LED parpadea cada vez más rápido, luego reinicia
+# LED básico (ya probado)
+./program simple_blink
 
-#include <avr/io.h>
+# LED con efectos más complejos
+./program blink2
 
-.section .text
-.global main
+# Ver diferencias en el código
+code src/simple_blink.asm
+code src/blink2.asm
+```
 
-main:
-    ; Configurar stack pointer
-    ldi r16, hi8(RAMEND)
-    out _SFR_IO_ADDR(SPH), r16
-    ldi r16, lo8(RAMEND)
-    out _SFR_IO_ADDR(SPL), r16
+### 💡 **Comparar los dos programas:**
 
-    ; Configurar PB5 como salida (LED)
-    ldi r16, (1<<DDB5)
-    out _SFR_IO_ADDR(DDRB), r16
+- **simple_blink.asm:** LED parpadea de forma simple y constante
+- **blink2.asm:** LED con patrones más complejos y efectos visuales
 
-    ; Inicializar contador de velocidad
-    ldi r19, 50         ; Velocidad inicial (más lento)
-
-main_loop:
-    ; Encender LED
-    sbi _SFR_IO_ADDR(PORTB), PORTB5
-
-    ; Delay variable
-    mov r20, r19
-    rcall delay_variable
-
-    ; Apagar LED
-    cbi _SFR_IO_ADDR(PORTB), PORTB5
-
-    ; Delay variable
-    mov r20, r19
-    rcall delay_variable
-
-    ; Aumentar velocidad (disminuir delay)
-    dec r19
-    cpi r19, 5          ; ¿Muy rápido?
-    brne continue       ; No, continuar
-    ldi r19, 50         ; Sí, reiniciar velocidad
-
-continue:
-    rjmp main_loop
-
-; Rutina de delay variable
-; r20 contiene el multiplicador
-delay_variable:
-    push r18
-    push r17
-    push r16
-
-outer_loop:
-    ldi r18, 100
-middle_loop:
-    ldi r17, 100
-inner_loop:
-    dec r17
-    brne inner_loop
+**🎯 Ejercicio:** Modifica los delays en `blink2.asm` para cambiar la velocidad del parpadeo.
 
     dec r18
     brne middle_loop

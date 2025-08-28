@@ -130,6 +130,70 @@ rm test_simple.*
 
 ---
 
+## 🔧 **PASO 4: Obtener el Proyecto Completo (2 min)**
+
+Ahora que tienes las herramientas instaladas, necesitas obtener el proyecto completo con todos los archivos necesarios (Makefile, script program, ejemplos, etc.).
+
+### 🔧 **Clonar el repositorio:**
+
+```bash
+# Ir a tu Desktop (o donde prefieras tener el proyecto)
+cd ~/Desktop
+
+# Clonar el repositorio completo
+git clone https://github.com/blorenzo-ceibal/ATmega328P_Assembly.git
+
+# Entrar a la carpeta del proyecto
+cd ATmega328P_Assembly
+
+# Verificar que tienes todos los archivos
+ls -la
+```
+
+**✅ Deberías ver:** `Makefile`, `program`, `src/`, `tutorial/`, etc.
+
+### 🔧 **Hacer el script ejecutable:**
+
+```bash
+# Hacer el script program ejecutable
+chmod +x program
+
+# Verificar que ahora es ejecutable
+ls -la program
+```
+
+**✅ Deberías ver algo como:** `-rwxr-xr-x ... program` (nota la "x" que indica ejecutable)
+
+### 🎯 **Probar el script:**
+
+```bash
+# Ver la ayuda del script
+./program -h
+```
+
+**✅ Si ves la ayuda del script con colores y ejemplos, ¡funciona perfectamente!**
+
+---
+
+## 🔧 **PASO 5: Configurar Script de Programación (2 min)**
+
+El repositorio ya incluye un script personalizado llamado `program` que automatiza todo el proceso de compilación y programación del ATmega328P. Como ya lo hiciste ejecutable en el paso anterior, ahora puedes usarlo directamente.
+
+###  **¿Qué hace este script?**
+
+El script `program` automatiza todo el workflow:
+1. **Compila** tu archivo .asm
+2. **Genera** el archivo .hex
+3. **Programa** el ATmega328P via Xplain Mini
+4. **Muestra** información útil del proceso
+
+**Ejemplos de uso:**
+```bash
+./program simple_blink      # Compila y programa simple_blink.asm
+./program blink2           # Compila y programa blink2.asm
+./program mi_proyecto      # Compila y programa mi_proyecto.asm
+```---
+
 ## ✅ **Checkpoint - Verificación Final**
 
 ### 🔍 **Comandos que DEBEN funcionar:**
@@ -143,11 +207,15 @@ avr-gcc --version
 
 # 3. Programador AVR detectado
 avrdude -c ?
+
+# 4. Script de programación disponible (en la carpeta del proyecto)
+cd ~/Desktop/ATmega328P_Assembly && ./program -h
 ```
 
 ### 📊 **Tu progreso actual:**
 - ✅ Requisitos verificados
 - ✅ **Instalación básica completa**
+- ✅ **Script de programación configurado**
 - ⏳ Workflow diario (¡siguiente!)
 - ⏳ Configurar VS Code
 - ⏳ Primer proyecto
@@ -167,6 +235,14 @@ avrdude -c ?
 ### ❌ **Error en compilación de prueba**
 - **Causa:** Sintaxis incorrecta (normal, es código muy básico)
 - **Solución:** Continúa al siguiente paso, ahí haremos un proyecto real
+
+### ❌ **"./program: Permission denied"**
+- **Causa:** El script program no tiene permisos de ejecución
+- **Solución:** Ejecutar `chmod +x program` en la carpeta del proyecto
+
+### ❌ **"./program: No such file or directory"**
+- **Causa:** No estás en la carpeta correcta del proyecto
+- **Solución:** Navegar a la carpeta que contiene el archivo `program` con `cd`
 
 ---
 

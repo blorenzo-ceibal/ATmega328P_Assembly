@@ -1,12 +1,12 @@
 # 🚀 Tutorial ATmega328P en Mac - Guía Completa
 
-## 👋 ¡Bienvenido estudiante de Ingeniería!
+## 👋 ¡Bienvenido!
 
 Esta guía te ayudará a **migrar de Microchip Studio (Windows) a un entorno profesional en macOS** para programar microcontroladores ATmega328P en Assembly usando VS Code.
 
-### 🎯 **¿Qué vas a lograr?**
+### ✅ **¿Qué vas a lograr?**
 - ✅ Configurar un entorno de desarrollo **más rápido** que Microchip Studio
-- ✅ Programar ATmega328P con **un solo comando**: `program archivo.asm`
+- ✅ Programar ATmega328P con **un solo comando**: `./program archivo`
 - ✅ Tener **syntax highlighting** y autocompletado profesional
 - ✅ **Workflow optimizado** para desarrollo de microcontroladores
 - ✅ **Estructura de proyecto profesional** con carpetas organizadas
@@ -91,11 +91,12 @@ Ve a: 02 (instalación) → 03 (workflow) → anexos de referencia
 # 1. Instalar herramientas
 brew tap osx-cross/avr && brew install avr-gcc avrdude
 
-# 2. Crear proyecto de prueba
-echo 'Código de prueba aquí' > test.asm
+# 2. Clonar proyecto completo
+git clone https://github.com/blorenzo-ceibal/ATmega328P_Assembly.git
+cd ATmega328P_Assembly
 
-# 3. Programar (después de configurar)
-program test.asm
+# 3. Programar (después de configurar hardware)
+./program simple_blink
 ```
 
 ---
@@ -110,13 +111,13 @@ program test.asm
 
 ---
 
-## 💡 **Para Profesores y Estudiantes**
+## 💡 **Para Desarrolladores y Entusiastas**
 
 Este tutorial está diseñado para:
-- **Estudiantes de Ingeniería Informática** (primeros años)
-- **Migración desde Microchip Studio**
-- **Desarrollo profesional en macOS**
-- **Aprendizaje de herramientas modernas**
+- **Desarrolladores** que migran desde Microchip Studio
+- **Entusiastas de microcontroladores** que prefieren macOS
+- **Profesionales** que buscan herramientas modernas
+- **Cualquier persona** interesada en programación de microcontroladores
 
 **¿Listo para empezar?** 👉 **[01-requisitos.md](01-requisitos.md)**
 

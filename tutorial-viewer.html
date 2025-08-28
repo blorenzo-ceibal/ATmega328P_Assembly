@@ -439,13 +439,13 @@
                 const embeddedContent = {
                     'tutorial/README.md': `# 🚀 Tutorial ATmega328P en Mac - Guía Completa
 
-## 👋 ¡Bienvenido estudiante de Ingeniería!
+## 👋 ¡Bienvenido!
 
 Esta guía te ayudará a **migrar de Microchip Studio (Windows) a un entorno profesional en macOS** para programar microcontroladores ATmega328P en Assembly usando VS Code.
 
 ### 🎯 **¿Qué vas a lograr?**
 - ✅ Configurar un entorno de desarrollo **más rápido** que Microchip Studio
-- ✅ Programar ATmega328P con **un solo comando**: \`program archivo.asm\`
+- ✅ Programar ATmega328P con **un solo comando**: \`./program archivo\`
 - ✅ Tener **syntax highlighting** y autocompletado profesional
 - ✅ **Workflow optimizado** para desarrollo de microcontroladores
 - ✅ **Estructura de proyecto profesional** con carpetas organizadas
@@ -506,14 +506,22 @@ Sigue el orden sugerido en el menú lateral para una experiencia de aprendizaje 
 brew install avr-gcc avrdude
 \`\`\`
 
-## **PASO 3: Verificar Instalación**
+## **PASO 3: Obtener Proyecto Completo**
+
+\`\`\`bash
+cd ~/Desktop
+git clone https://github.com/blorenzo-ceibal/ATmega328P_Assembly.git
+cd ATmega328P_Assembly
+chmod +x program
+\`\`\`
+
+## **PASO 4: Verificar Instalación**
 
 \`\`\`bash
 avr-gcc --version
 avrdude -?
-\`\`\`
-
-¡Listo para el siguiente paso!`,
+./program -h
+\`\`\`¡Listo para el siguiente paso!`,
 
                     'tutorial/03-workflow-diario.md': `# ⚡ 03 - Tu Workflow Diario
 
@@ -521,7 +529,7 @@ avrdude -?
 
 \`\`\`bash
 # Tu nuevo comando favorito:
-program mi_archivo.asm
+./program mi_archivo
 \`\`\`
 
 **¡Eso es todo!** Un comando que:
@@ -533,14 +541,14 @@ program mi_archivo.asm
 ## 💡 **Ejemplos Reales**
 
 \`\`\`bash
-# Hacer parpadear un LED
-program simple_blink.asm
+# Hacer parpadear un LED (archivos incluidos en el proyecto)
+./program simple_blink
 
-# Leer un botón
-program button_test
+# Programa más avanzado
+./program blink2
 
-# Tu proyecto final
-program practica_final
+# Tus propios proyectos
+./program mi_proyecto
 \`\`\``,
 
                     'tutorial/04-configurar-vscode.md': `# 💻 04 - Configurar VS Code
@@ -784,7 +792,7 @@ cp ~/templates/basic_atmega328.asm src/main.asm
                     'tutorial/anexos/makefile-completo.md': `# 📋 Makefile Completo Documentado
 
 > **🎯 Objetivo:** Entender cada línea del Makefile para ATmega328P
-> **📋 Nivel:** Intermedio - para estudiantes que quieren personalizar
+> **📋 Nivel:** Intermedio - para usuarios que quieren personalizar
 
 ## 🔧 **Makefile Completo con Documentación**
 
@@ -917,7 +925,7 @@ make clean
                     'tutorial/anexos/script-program.md': `# 🚀 Script Program - Explicación Línea por Línea
 
 > **🎯 Objetivo:** Entender completamente cómo funciona el script \`program\`
-> **📋 Nivel:** Intermedio - para estudiantes que quieren personalizar
+> **📋 Nivel:** Intermedio - para usuarios que quieren personalizar
 
 ## 🌟 **Características Principales**
 

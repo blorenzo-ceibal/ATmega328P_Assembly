@@ -10,7 +10,7 @@ Con las herramientas que acabas de instalar, **este será tu workflow diario:**
 
 ```bash
 # Tu nuevo comando favorito:
-program mi_archivo.asm
+./program mi_archivo
 ```
 
 **¡Eso es todo!** Un comando que:
@@ -22,20 +22,17 @@ program mi_archivo.asm
 ## 💡 **Ejemplos Reales (funcionarán después del setup completo)**
 
 ```bash
-# Hacer parpadear un LED
-program simple_blink.asm     # El script busca automáticamente en src/
+# Hacer parpadear un LED (usando archivos que ya existen en el proyecto)
+./program simple_blink     # El script busca automáticamente en src/
+
+# Programa más complejo
+./program blink2
 
 # Sin extensión también funciona
-program simple_blink
+./program simple_blink
 
-# Leer un botón
-program button_test
-
-# Comunicación serie
-program serial_hello
-
-# Tu proyecto de la universidad
-program practica_final
+# Para tus propios proyectos
+./program mi_proyecto
 ```
 
 **💡 Nota importante:** El script `program` busca automáticamente tus archivos `.asm` en la carpeta `src/` y coloca los archivos generados (.hex, .elf, .o) en la carpeta `build/` para mantener tu proyecto ordenado.
@@ -48,10 +45,10 @@ program practica_final
 
 ```bash
 # El comando todo-en-uno (tu favorito)
-program archivo.asm
+./program archivo
 
 # Ver ayuda del comando
-program --help
+./program --help
 
 # Limpiar archivos temporales
 make clean
