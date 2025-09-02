@@ -631,7 +631,7 @@ inner_loop:
 ## **PASO 3: Programar**
 
 \`\`\`bash
-program simple_blink
+./program simple_blink
 \`\`\`
 
 ¡Deberías ver tu LED parpadeando! 🎉`,
@@ -1250,7 +1250,181 @@ avrdude -c xplainedmini -p atmega328p -P usb -v 2>&1 | tee avrdude.log
 2. ¿Script program tiene permisos +x?
 3. ¿Xplain Mini conectada y detectada?
 4. ¿Sintaxis Assembly correcta?
-5. ¿Definiciones m328pdef.inc actualizadas?`
+5. ¿Definiciones m328pdef.inc actualizadas?`,
+
+                    'tutorial/06-hardware-xplain.md': `# 🔌 06 - Configuración Hardware Xplain Mini
+
+> **⏱️ Tiempo estimado:** 3 minutos
+> **🎯 Objetivo:** Configuración específica y avanzada para Xplain Mini
+> **📋 Prerequisito:** Haber completado [05-primer-proyecto.md](05-primer-proyecto.md) ✅
+
+## 🎯 **¿Ya funciona tu LED? ¡Perfecto!**
+
+Si completaste el paso anterior exitosamente, **tu hardware ya está funcionando**. Este paso te da información adicional para **optimizar y entender mejor** tu configuración.
+
+## 🔍 **PASO 1: Identificación Completa del Hardware (1 min)**
+
+### 🔧 **Información detallada de tu Xplain Mini:**
+
+\`\`\`bash
+# Ver información USB completa
+system_profiler SPUSBDataType | grep -A 10 -B 5 "Xplain\\|EDBG\\|Microchip"
+\`\`\`
+
+**✅ Deberías ver algo como:**
+\`\`\`
+EDBG CMSIS-DAP:
+  Product ID: 0x2111
+  Vendor ID: 0x03eb (Atmel Corporation)
+  Version: 1.00
+  Serial Number: ATML2130031800004957
+  Speed: Up to 480 Mb/s
+  Manufacturer: Atmel Corp.
+  Location ID: 0x14200000 / 20
+\`\`\`
+
+### 🔧 **Verificar puertos serie disponibles:**
+
+\`\`\`bash
+# Listar todos los puertos serie
+ls /dev/cu.*
+
+# Filtrar solo los relevantes
+ls /dev/cu.usbmodem* 2>/dev/null || echo "No hay puertos usbmodem detectados"
+\`\`\`
+
+## ⚙️ **PASO 2: Configuración de Permisos macOS (1 min)**
+
+### 🔧 **Optimizar permisos para acceso sin sudo:**
+
+\`\`\`bash
+# Agregar tu usuario al grupo de desarrolladores (mejora el acceso a dispositivos)
+sudo dseditgroup -o edit -a $(whoami) -t user _developer
+
+# Verificar que fue agregado
+dseditgroup -o read _developer | grep $(whoami)
+\`\`\`
+
+**💡 Esto mejora la estabilidad de la comunicación con la Xplain Mini.**
+
+## 🔧 **PASO 3: Comandos de Diagnóstico Avanzados (1 min)**
+
+### 🔍 **Información completa del microcontrolador:**
+
+\`\`\`bash
+# Test completo de comunicación con detalles
+avrdude -c xplainedmini -p atmega328p -P usb -v -v
+\`\`\`
+
+### 🔧 **Leer fusibles del microcontrolador:**
+
+\`\`\`bash
+# Ver configuración actual de fusibles
+avrdude -c xplainedmini -p atmega328p -P usb -U lfuse:r:-:h -U hfuse:r:-:h -U efuse:r:-:h
+\`\`\`
+
+**✅ Hardware optimizado →** **[07-proyectos-ejemplo.md](07-proyectos-ejemplo.md)**`,
+
+                    'tutorial/07-proyectos-ejemplo.md': `# 📚 07 - Proyectos Ejemplo
+
+> **⏱️ Tiempo estimado:** Variable (cada proyecto 5-10 min)
+> **🎯 Objetivo:** Proyectos adicionales para practicar y expandir conocimientos
+> **📋 Prerequisito:** Haber completado [06-hardware-xplain.md](06-hardware-xplain.md) ✅
+
+## 🎯 **¡Tu Setup Está Completo!**
+
+Con tu entorno configurado, ahora puedes crear **cualquier proyecto** para ATmega328P. Aquí tienes ejemplos progresivos para seguir aprendiendo.
+
+## 🚀 **Proyecto 1: Explorar los Ejemplos Incluidos (5 min)**
+
+### 📝 **Probar los programas incluidos:**
+
+\`\`\`bash
+# LED básico (ya probado)
+./program simple_blink
+
+# LED con efectos más complejos
+./program blink2
+
+# Ver diferencias en el código
+code src/simple_blink.asm
+code src/blink2.asm
+\`\`\`
+
+### 💡 **Comparar los dos programas:**
+
+- **simple_blink.asm:** LED parpadea de forma simple y constante
+- **blink2.asm:** LED con patrones más complejos y efectos visuales
+
+**🎯 Ejercicio:** Modifica los delays en \`blink2.asm\` para cambiar la velocidad del parpadeo.
+
+## 🔘 **Proyecto 2: Lectura de Botón (7 min)**
+
+### 📝 **Código - button_test.asm:**
+
+\`\`\`assembly
+; ===============================================
+; LECTURA DE BOTÓN - ATmega328P
+; ===============================================
+; LED se enciende mientras se presiona el botón
+; Botón en PB0, LED en PB5
+
+#include <avr/io.h>
+
+.section .text
+.global main
+
+main:
+    ; Configurar stack pointer
+    ldi r16, hi8(RAMEND)
+    out _SFR_IO_ADDR(SPH), r16
+    ldi r16, lo8(RAMEND)
+    out _SFR_IO_ADDR(SPL), r16
+
+    ; Configurar pines
+    ldi r16, (1<<DDB5)      ; PB5 como salida (LED)
+    out _SFR_IO_ADDR(DDRB), r16
+
+    ; PB0 como entrada con pull-up interno
+    ldi r16, (1<<PORTB0)    ; Activar pull-up en PB0
+    out _SFR_IO_ADDR(PORTB), r16
+
+main_loop:
+    ; Leer estado del botón (PB0)
+    in r17, _SFR_IO_ADDR(PINB)
+    andi r17, (1<<PINB0)    ; Aislar bit 0
+
+    ; ¿Botón presionado? (0 cuando se presiona por pull-up)
+    breq button_pressed     ; Si es 0, botón presionado
+
+button_released:
+    ; Apagar LED
+    cbi _SFR_IO_ADDR(PORTB), PORTB5
+    rjmp main_loop
+
+button_pressed:
+    ; Encender LED
+    sbi _SFR_IO_ADDR(PORTB), PORTB5
+    rjmp main_loop
+\`\`\`
+
+### 🚀 **Programar y probar:**
+
+\`\`\`bash
+./program button_test
+# LED se enciende al presionar botón (o conectar PB0 a GND)
+\`\`\`
+
+## ✅ **¡Tu Arsenal Completo Está Listo!**
+
+### 🏆 **Lo que has logrado:**
+- ✅ **Setup profesional** Mac para ATmega328P
+- ✅ **5 proyectos funcionales** de ejemplo
+- ✅ **Workflow optimizado** para desarrollo rápido
+- ✅ **Base sólida** para proyectos universitarios
+- ✅ **Herramientas profesionales** nivel industria
+
+**✅ ¡Tutorial COMPLETO! 🎉**`
                 };
 
                 return embeddedContent[filePath] || `# ❌ Contenido no disponible
