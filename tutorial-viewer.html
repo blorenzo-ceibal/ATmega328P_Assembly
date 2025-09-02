@@ -290,27 +290,31 @@
                     <span class="emoji">🛠️</span> Instalación Básica
                     <span class="time">10 min</span>
                 </div>
-                <div class="nav-item" data-file="tutorial/03-workflow-diario.md">
+                <div class="nav-item" data-file="tutorial/03-configurar-shell.md">
+                    <span class="emoji">⚙️</span> Configurar Shell
+                    <span class="time">3 min</span>
+                </div>
+                <div class="nav-item" data-file="tutorial/04-workflow-diario.md">
                     <span class="emoji">⚡</span> Workflow Diario
-                    <span class="time">7 min</span>
+                    <span class="time">5 min</span>
                 </div>
             </div>
 
             <div class="nav-section">
                 <h3>🔧 Configuración Avanzada</h3>
-                <div class="nav-item" data-file="tutorial/04-configurar-vscode.md">
+                <div class="nav-item" data-file="tutorial/05-configurar-vscode.md">
                     <span class="emoji">💻</span> Configurar VS Code
                     <span class="time">12 min</span>
                 </div>
-                <div class="nav-item" data-file="tutorial/05-primer-proyecto.md">
+                <div class="nav-item" data-file="tutorial/06-primer-proyecto.md">
                     <span class="emoji">🎯</span> Primer Proyecto
                     <span class="time">10 min</span>
                 </div>
-                <div class="nav-item" data-file="tutorial/06-hardware-xplain.md">
+                <div class="nav-item" data-file="tutorial/07-hardware-xplain.md">
                     <span class="emoji">🔌</span> Hardware Xplain
                     <span class="time">8 min</span>
                 </div>
-                <div class="nav-item" data-file="tutorial/07-proyectos-ejemplo.md">
+                <div class="nav-item" data-file="tutorial/08-proyectos-ejemplo.md">
                     <span class="emoji">🚀</span> Proyectos Ejemplo
                     <span class="time">15 min</span>
                 </div>
@@ -445,7 +449,7 @@ Esta guía te ayudará a **migrar de Microchip Studio (Windows) a un entorno pro
 
 ### 🎯 **¿Qué vas a lograr?**
 - ✅ Configurar un entorno de desarrollo **más rápido** que Microchip Studio
-- ✅ Programar ATmega328P con **un solo comando**: \`./program archivo\`
+- ✅ Programar ATmega328P con **un solo comando**: \`program archivo\`
 - ✅ Tener **syntax highlighting** y autocompletado profesional
 - ✅ **Workflow optimizado** para desarrollo de microcontroladores
 - ✅ **Estructura de proyecto profesional** con carpetas organizadas
@@ -520,16 +524,84 @@ chmod +x program
 \`\`\`bash
 avr-gcc --version
 avrdude -?
-./program -h
+program -h
 \`\`\`¡Listo para el siguiente paso!`,
 
-                    'tutorial/03-workflow-diario.md': `# ⚡ 03 - Tu Workflow Diario
+                    'tutorial/03-configurar-shell.md': `# ⚡ 03 - Configurar Shell para Uso Global
+
+> **⏱️ Tiempo estimado:** 3 minutos
+> **🎯 Objetivo:** Configurar el comando \`program\` para usar desde cualquier directorio
+> **📋 Prerequisito:** Haber completado [02-instalacion-basica.md](02-instalacion-basica.md) ✅
+
+## 🌟 **¿Por qué configurar esto?**
+
+Hasta ahora has usado \`program archivo.asm\`, pero esto te limita a estar siempre en la carpeta del tutorial.
+
+**Con esta configuración podrás:**
+- ✅ Usar \`program archivo.asm\` desde **cualquier directorio**
+- ✅ Crear proyectos en **cualquier carpeta** de tu Mac
+- ✅ Workflow más **profesional** y cómodo
+- ✅ **Mismo comando** sin importar dónde estés
+
+## 🚀 **Configuración Automática del Alias**
+
+Ejecuta este script en tu terminal:
+
+\`\`\`bash
+# Configuración automática del comando 'program'
+configure_program_alias() {
+    echo "🔍 Configurando alias global para 'program'..."
+
+    # Buscar repositorio
+    if [[ "\$(pwd)" == *"ATmega328P_Assembly"* ]] && [ -x "\$(pwd)/program" ]; then
+        REPO_PATH="\$(pwd)"
+        echo "✅ Usando directorio actual: \$REPO_PATH"
+    else
+        REPO_PATH=\$(find "\$HOME" -name "ATmega328P_Assembly" -type d 2>/dev/null | head -1)
+        if [ -n "\$REPO_PATH" ] && [ -x "\$REPO_PATH/program" ]; then
+            echo "✅ Repositorio encontrado: \$REPO_PATH"
+        else
+            echo "❌ No se encontró el repositorio"
+            return 1
+        fi
+    fi
+
+    # Configurar alias
+    echo "" >> ~/.zshrc
+    echo "# ATmega328P Programming Command - \$(date '+%Y-%m-%d')" >> ~/.zshrc
+    echo "alias program='\$REPO_PATH/program'" >> ~/.zshrc
+
+    echo "🎉 Alias configurado correctamente"
+    source ~/.zshrc
+
+    if command -v program >/dev/null 2>&1; then
+        echo "✅ ¡Listo! Usa 'program archivo.asm' desde cualquier directorio"
+    fi
+}
+
+# Ejecutar configuración
+configure_program_alias
+\`\`\`
+
+## ✅ **Verificar Configuración**
+
+\`\`\`bash
+# Probar desde otro directorio
+cd ~/Desktop
+program simple_blink
+\`\`\`
+
+**¡Ahora puedes crear proyectos en cualquier carpeta de tu Mac!**`,
+
+                    'tutorial/04-workflow-diario.md': `# ⚡ 04 - Tu Workflow Diario
 
 ## 🚀 **¡El Comando Mágico!**
 
+Ahora que tienes configurado el alias global:
+
 \`\`\`bash
 # Tu nuevo comando favorito:
-./program mi_archivo
+program mi_archivo
 \`\`\`
 
 **¡Eso es todo!** Un comando que:
@@ -542,16 +614,16 @@ avrdude -?
 
 \`\`\`bash
 # Hacer parpadear un LED (archivos incluidos en el proyecto)
-./program simple_blink
+program simple_blink
 
 # Programa más avanzado
-./program blink2
+program blink2
 
 # Tus propios proyectos
-./program mi_proyecto
+program mi_proyecto
 \`\`\``,
 
-                    'tutorial/04-configurar-vscode.md': `# 💻 04 - Configurar VS Code
+                    'tutorial/05-configurar-vscode.md': `# 💻 05 - Configurar VS Code
 
 ## **Instalar VS Code**
 
@@ -571,7 +643,7 @@ avrdude -?
 
 Recomendado: **Dark+ theme** con **Monaco** font para mejor legibilidad del código Assembly.`,
 
-                    'tutorial/05-primer-proyecto.md': `# 🎯 05 - Tu Primer Proyecto
+                    'tutorial/06-primer-proyecto.md': `# 🎯 05 - Tu Primer Proyecto
 
 ## **PASO 1: Crear Estructura**
 
@@ -631,7 +703,7 @@ inner_loop:
 ## **PASO 3: Programar**
 
 \`\`\`bash
-./program simple_blink
+program simple_blink
 \`\`\`
 
 ¡Deberías ver tu LED parpadeando! 🎉`,
@@ -1149,7 +1221,7 @@ mkdir -p src
 mv *.asm src/  # Mover archivos .asm a src/
 
 # O compilar desde directorio actual
-./program ./mi_archivo.asm
+program ./mi_archivo.asm
 \`\`\`
 
 ## 🔍 **Comandos de Diagnóstico**
@@ -1230,7 +1302,7 @@ system_profiler SPUSBDataType | grep -A5 -B5 -i xplain
 ### **Logs Útiles**
 \`\`\`bash
 # Log completo de compilación
-./program archivo.asm 2>&1 | tee debug.log
+program archivo.asm 2>&1 | tee debug.log
 
 # Log de avrdude solamente
 avrdude -c xplainedmini -p atmega328p -P usb -v 2>&1 | tee avrdude.log
@@ -1252,7 +1324,7 @@ avrdude -c xplainedmini -p atmega328p -P usb -v 2>&1 | tee avrdude.log
 4. ¿Sintaxis Assembly correcta?
 5. ¿Definiciones m328pdef.inc actualizadas?`,
 
-                    'tutorial/06-hardware-xplain.md': `# 🔌 06 - Configuración Hardware Xplain Mini
+                    'tutorial/07-hardware-xplain.md': `# 🔌 06 - Configuración Hardware Xplain Mini
 
 > **⏱️ Tiempo estimado:** 3 minutos
 > **🎯 Objetivo:** Configuración específica y avanzada para Xplain Mini
@@ -1325,7 +1397,7 @@ avrdude -c xplainedmini -p atmega328p -P usb -U lfuse:r:-:h -U hfuse:r:-:h -U ef
 
 **✅ Hardware optimizado →** **[07-proyectos-ejemplo.md](07-proyectos-ejemplo.md)**`,
 
-                    'tutorial/07-proyectos-ejemplo.md': `# 📚 07 - Proyectos Ejemplo
+                    'tutorial/08-proyectos-ejemplo.md': `# 📚 07 - Proyectos Ejemplo
 
 > **⏱️ Tiempo estimado:** Variable (cada proyecto 5-10 min)
 > **🎯 Objetivo:** Proyectos adicionales para practicar y expandir conocimientos
@@ -1341,10 +1413,10 @@ Con tu entorno configurado, ahora puedes crear **cualquier proyecto** para ATmeg
 
 \`\`\`bash
 # LED básico (ya probado)
-./program simple_blink
+program simple_blink
 
 # LED con efectos más complejos
-./program blink2
+program blink2
 
 # Ver diferencias en el código
 code src/simple_blink.asm
@@ -1411,7 +1483,7 @@ button_pressed:
 ### 🚀 **Programar y probar:**
 
 \`\`\`bash
-./program button_test
+program button_test
 # LED se enciende al presionar botón (o conectar PB0 a GND)
 \`\`\`
 

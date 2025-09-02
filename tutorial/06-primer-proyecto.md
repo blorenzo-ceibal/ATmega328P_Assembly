@@ -2,7 +2,7 @@
 
 > **⏱️ Tiempo estimado:** 10 minutos
 > **🎯 Objetivo:** Probar tu primer proyecto completo: LED parpadeante funcional
-> **📋 Prerequisito:** Haber completado [04-workflow-diario.md](04-workflow-diario.md) ✅
+> **📋 Prerequisite:** Haber completado [05-configurar-vscode.md](05-configurar-vscode.md) ✅
 
 ## 🚀 **¡El Momento de la Verdad!**
 

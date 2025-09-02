@@ -1,38 +1,38 @@
-# ⚡ 03 - Tu Workflow Diario
+# ⚡ 04 - Tu Workflow Diario
 
-> **⏱️ Tiempo estimado:** 7 minutos
-> **🎯 Objetivo:** ¡Descubrir los comandos que cambiarán tu vida de programador!
-> **📋 Prerequisito:** Haber completado [02-instalacion-basica.md](02-instalacion-basica.md)
+> **⏱️ Tiempo estimado:** 5 minutos
+> **🎯 Objetivo:** Dominar el comando `program` y tu nuevo workflow diario
+> **📋 Prerequisito:** Haber completado [03-configurar-shell.md](03-configurar-shell.md) ✅
 
-## 🚀 **¡El Comando Mágico que Estabas Esperando!**
+## 🚀 **¡El Comando Mágico!**
 
-Con las herramientas que acabas de instalar, **este será tu workflow diario:**
+Ahora que tienes configurado el alias global, tu comando diario es súper simple:
 
 ```bash
-# Tu nuevo comando favorito:
-./program mi_archivo
+# Tu nuevo comando favorito desde CUALQUIER directorio:
+program mi_archivo
 ```
 
 **¡Eso es todo!** Un comando que:
-- ✅ **Compila** tu código Assembly
-- ✅ **Programa** el ATmega328P automáticamente
+- ✅ **Compila** tu código Assembly automáticamente
+- ✅ **Programa** el ATmega328P sin pasos extra
 - ✅ **Verifica** que todo salió bien
-- ✅ **Te dice** si hay errores
+- ✅ **Te dice** si hay errores y cómo solucionarlos
 
 ## 💡 **Ejemplos Reales (funcionarán después del setup completo)**
 
 ```bash
 # Hacer parpadear un LED (usando archivos que ya existen en el proyecto)
-./program simple_blink     # El script busca automáticamente en src/
+program simple_blink     # El script busca automáticamente en src/
 
 # Programa más complejo
-./program blink2
+program blink2
 
 # Sin extensión también funciona
-./program simple_blink
+program simple_blink
 
 # Para tus propios proyectos
-./program mi_proyecto
+program mi_proyecto
 ```
 
 **💡 Nota importante:** El script `program` busca automáticamente tus archivos `.asm` en la carpeta `src/` y coloca los archivos generados (.hex, .elf, .o) en la carpeta `build/` para mantener tu proyecto ordenado.
@@ -45,10 +45,10 @@ Con las herramientas que acabas de instalar, **este será tu workflow diario:**
 
 ```bash
 # El comando todo-en-uno (tu favorito)
-./program archivo
+program archivo
 
 # Ver ayuda del comando
-./program --help
+program --help
 
 # Limpiar archivos temporales
 make clean

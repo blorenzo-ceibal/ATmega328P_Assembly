@@ -16,10 +16,10 @@ Con tu entorno configurado, ahora puedes crear **cualquier proyecto** para ATmeg
 
 ```bash
 # LED básico (ya probado)
-./program simple_blink
+program simple_blink
 
 # LED con efectos más complejos
-./program blink2
+program blink2
 
 # Ver diferencias en el código
 code src/simple_blink.asm
@@ -50,7 +50,7 @@ EOF
 
 ```bash
 # Compilar y programar
-./program blink_variable
+program blink_variable
 
 # ¡El LED debe parpadear cada vez más rápido!
 ```
@@ -116,7 +116,7 @@ EOF
 ### 🚀 **Programar y probar:**
 
 ```bash
-./program button_test
+program button_test
 # LED se enciende al presionar botón (o conectar PB0 a GND)
 ```
 
@@ -254,7 +254,7 @@ EOF
 
 ```bash
 # 1. Programar el microcontrolador
-./program serial_hello
+program serial_hello
 
 # 2. Abrir monitor serie para ver los mensajes
 make monitor
@@ -375,7 +375,7 @@ EOF
 ### 🚀 **Programar y probar:**
 
 ```bash
-./program tone_generator
+program tone_generator
 # Deberías escuchar 3 tonos diferentes que se repiten
 # O ver LED parpadeando a diferentes frecuencias
 ```
@@ -472,7 +472,7 @@ EOF
 ### 🚀 **Programar y probar:**
 
 ```bash
-./program led_sequence
+program led_sequence
 # El LED integrado se moverá en patrón de ida y vuelta
 # Si tienes LEDs externos en PB0-PB4, verás el efecto completo
 ```
@@ -485,7 +485,7 @@ EOF
 
 ```bash
 # Compilar cualquier proyecto
-./program nombre_proyecto
+program nombre_proyecto
 
 # Usar Makefile específico
 make program-xplain-nombre_proyecto
@@ -550,7 +550,7 @@ make monitor
 
 ```bash
 # Para siempre:
-./program mi_nuevo_proyecto.asm
+program mi_nuevo_proyecto.asm
 ```
 
 **¡Eso es todo! Ahora eres completamente independiente para desarrollar en ATmega328P en Mac.**
